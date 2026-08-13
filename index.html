@@ -6,33 +6,35 @@
     <title>Gestão de Multas e Processos</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f0f4f8; color: #1e293b; }
-        header { background: #162c47; color: white; padding: 1.2rem; font-size: 1.3rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        html, body { width: 100%; }
+        body { background: #f0f4f8; color: #1e293b; padding-bottom: 80px; }
+        header { background: #162c47; color: white; padding: 1.2rem; font-size: 1.3rem; font-weight: 600; }
         .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
         .painel { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
         .card { padding: 1.2rem; border-radius: 10px; text-align: center; font-size: 1.1rem; font-weight: 500; }
         .card-azul { background: #2563eb; color: white; }
         .card-laranja { background: #f59e0b; color: white; }
         form { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 2rem; }
-        h2 { margin: 1rem 0; color: #162c47; }
+        h2 { margin: 1.5rem 0 1rem; color: #162c47; font-size: 1.15rem; }
         label { display: block; margin: 1rem 0 0.4rem; font-weight: 500; color: #334155; }
-        input, select, textarea { width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fcfcfc; }
-        button { margin-top: 1.5rem; padding: 1rem; width: 100%; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #1d4ed8; }
-        .lista { margin-top: 2rem; }
-        .item { background: white; padding: 1.2rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #2563eb; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .item p { margin: 0.3rem 0; color: #475569; }
+        input, select { width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fcfcfc; }
+        button { margin-top: 1.5rem; padding: 1rem; width: 100%; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
+        .btn-verde { background: #10b981; padding: 0.5rem 0.8rem; width: auto; font-size: 0.85rem; margin-top: 0; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-vermelho { background: #dc2626; padding: 0.5rem 0.8rem; width: auto; font-size: 0.85rem; margin-top: 0; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-voltar { background: #6366f1; margin-bottom: 1rem; }
+        .item { background: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #2563eb; }
+        .item p { margin: 0.3rem 0; color: #475569; font-size: 0.95rem; }
         .item strong { color: #1e293b; }
         .vazio { text-align: center; color: #64748b; padding: 2rem; }
+        .botoes-lado { display: flex; gap: 0.6rem; margin-top: 0.8rem; }
         nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 0.7rem 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 100; }
-        nav a { text-align: center; color: #475569; text-decoration: none; font-size: 0.85rem; }
+        nav a { text-align: center; color: #475569; text-decoration: none; font-size: 0.8rem; }
         nav a.ativo { color: #2563eb; font-weight: 600; }
         .pagina { display: none; }
         .pagina.ativa { display: block; }
-        main { padding-bottom: 70px; }
-        .botoes-acao { display: flex; gap: 0.75rem; margin-top: 0.8rem; }
-        .btn-excluir { background: #dc2626; padding: 0.6rem 1.2rem; width: auto; font-size: 0.95rem; margin-top: 0; }
-        .btn-excluir:hover { background: #b91c1c; }
+        .caixa-detalhes { background: white; padding: 1.5rem; border-radius: 12px; margin-top: 1rem; }
+        .caixa-detalhes p { margin: 0.6rem 0; padding-bottom: 0.4rem; border-bottom: 1px dashed #e2e8f0; }
+        .alerta { color: #dc2626; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -53,8 +55,18 @@
                 <div>Prazos a vencer</div>
             </div>
         </div>
-        <h3>Próximos Prazos</h3>
+
+        <h2>Próximos Prazos</h2>
         <div id="lista-prazos" class="vazio">Nenhum prazo cadastrado.</div>
+
+        <h2>Todos os Processos</h2>
+        <div id="lista-processos"></div>
+
+        <div id="area-detalhes" style="display: none;">
+            <button class="btn-voltar" onclick="voltarLista()">← Voltar para Lista</button>
+            <h2>Detalhes do Processo</h2>
+            <div class="caixa-detalhes" id="conteudo-detalhes"></div>
+        </div>
     </div>
 
     <!-- Cliente -->
@@ -73,7 +85,7 @@
             <input type="email" id="cliente-email" placeholder="email@exemplo.com">
             <button type="submit">✅ Salvar Cliente</button>
         </form>
-        <div id="dados-cliente" class="lista"></div>
+        <div id="dados-cliente"></div>
     </div>
 
     <!-- Veículo -->
@@ -89,18 +101,22 @@
             <label>Cor</label>
             <input type="text" id="veiculo-cor" placeholder="Prata">
             <label>Proprietário</label>
-            <input type="text" id="veiculo-proprietario" placeholder="Nome do proprietário">
+            <select id="veiculo-proprietario">
+                <option value="">-- Selecione um Cliente --</option>
+            </select>
             <button type="submit">✅ Salvar Veículo</button>
         </form>
-        <div id="lista-veiculos" class="lista"></div>
+        <div id="lista-veiculos"></div>
     </div>
 
     <!-- Processo -->
     <div id="pagina-processo" class="pagina">
-        <h2>Cadastrar Processo</h2>
+        <h2>Cadastrar Novo Processo</h2>
         <form id="form-processo">
             <label>Veículo / Condutor</label>
-            <input type="text" id="proc-condutor" placeholder="Placa – Nome">
+            <select id="proc-veiculo">
+                <option value="">-- Selecione um Veículo --</option>
+            </select>
             <label>Nº do Auto de Infração</label>
             <input type="text" id="proc-numero" placeholder="Ex: 5473828292">
             <label>Órgão Autuador</label>
@@ -129,8 +145,6 @@
             <input type="date" id="proc-prazo-recurso">
             <button type="submit">✅ Salvar Processo</button>
         </form>
-        <h2>Lista de Processos</h2>
-        <div id="lista-processos" class="lista"><p class="vazio">Nenhum processo cadastrado.</p></div>
     </div>
 
     <!-- Leis -->
@@ -144,7 +158,7 @@
             <button type="submit">✅ Salvar Artigo</button>
         </form>
         <h2>Artigos Cadastrados</h2>
-        <div id="lista-leis" class="lista"><p class="vazio">Nenhum artigo cadastrado.</p></div>
+        <div id="lista-leis"></div>
     </div>
 
     <!-- Documentos -->
@@ -158,12 +172,11 @@
             <button type="submit">✅ Salvar Documento</button>
         </form>
         <h2>Documentos Salvos</h2>
-        <div id="lista-docs" class="lista"><p class="vazio">Nenhum documento salvo.</p></div>
+        <div id="lista-docs"></div>
     </div>
 
 </main>
 
-<!-- Navegação -->
 <nav>
     <a href="#" class="aba ativo" data-pagina="inicio">🏠 Início</a>
     <a href="#" class="aba" data-pagina="cliente">👤 Cliente</a>
@@ -174,155 +187,296 @@
 </nav>
 
 <script>
-// === FUNÇÕES AUXILIARES ===
-function lsGet(chave) { return JSON.parse(localStorage.getItem(chave) || '[]'); }
-function lsSet(chave, lista) { localStorage.setItem(chave, JSON.stringify(lista)); }
-function formatarData(d) { if(!d)return'-'; const [a,m,dd]=d.split('-'); return `${dd}/${m}/${a}`; }
-function diasAte(d) { if(!d)return9999; const alvo=new Date(d), hj=new Date(); hj.setHours(0,0,0,0); return Math.ceil((alvo-hj)/(1000*60*60*24)); }
+function lsGet(chave) {
+  const d = localStorage.getItem(chave);
+  return d ? JSON.parse(d) : [];
+}
+function lsSet(chave, lista) {
+  localStorage.setItem(chave, JSON.stringify(lista));
+}
+function formatarData(d) {
+  if(!d) return '-';
+  const [a,m,dd] = d.split('-');
+  return `${dd}/${m}/${a}`;
+}
+function diasAte(d) {
+  if(!d) return 9999;
+  const hj = new Date(); hj.setHours(0,0,0,0);
+  const alvo = new Date(d);
+  return Math.ceil((alvo - hj)/(1000*60*60*24));
+}
 
-// === NAVEGAÇÃO ===
-document.querySelectorAll('.aba').forEach(aba=>{
-    aba.addEventListener('click',e=>{
-        e.preventDefault();
-        document.querySelectorAll('.aba').forEach(a=>a.classList.remove('ativo'));
-        aba.classList.add('ativo');
-        document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
-        document.getElementById(`pagina-${aba.dataset.pagina}`).classList.add('ativa');
-    });
+function carregarOpcoes() {
+  const clientes = lsGet('clientes');
+  const selProp = document.getElementById('veiculo-proprietario');
+  selProp.innerHTML = '<option value="">-- Selecione um Cliente --</option>';
+  clientes.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.nome;
+    opt.textContent = c.nome + (c.cpf ? ` - ${c.cpf}` : '');
+    selProp.appendChild(opt);
+  });
+
+  const veiculos = lsGet('veiculos');
+  const selProc = document.getElementById('proc-veiculo');
+  selProc.innerHTML = '<option value="">-- Selecione um Veículo --</option>';
+  veiculos.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.placa + ' – ' + (v.proprietario || 'Sem proprietário');
+    opt.textContent = v.placa + ' – ' + (v.proprietario || 'Sem proprietário');
+    selProc.appendChild(opt);
+  });
+}
+
+document.querySelectorAll('.aba').forEach(aba => {
+  aba.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativo'));
+    aba.classList.add('ativo');
+    document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+    document.getElementById('pagina-' + aba.dataset.pagina).classList.add('ativa');
+    voltarLista();
+    carregarOpcoes();
+  });
 });
 
-// === CLIENTE ===
-document.getElementById('form-cliente').addEventListener('submit',e=>{
-    e.preventDefault();
-    const c = {
-        nome:document.getElementById('cliente-nome').value.trim(),
-        cpf:document.getElementById('cliente-cpf').value.trim(),
-        endereco:document.getElementById('cliente-endereco').value.trim(),
-        telefone:document.getElementById('cliente-telefone').value.trim(),
-        email:document.getElementById('cliente-email').value.trim()
-    };
-    lsSet('clientes', [c]);
-    e.target.reset();
-    alert('✅ Cliente salvo!');
+function voltarLista() {
+  document.getElementById('lista-processos').style.display = 'block';
+  document.getElementById('area-detalhes').style.display = 'none';
+}
+
+window.verDetalhes = function(i) {
+  const p = lsGet('processos')[i];
+  const dDef = diasAte(p.prazoDefesa);
+  const dRec = diasAte(p.prazoRecurso);
+  document.getElementById('conteudo-detalhes').innerHTML = `
+    <p><strong>Veículo / Condutor:</strong> ${p.veiculo}</p>
+    <p><strong>Nº do Auto:</strong> ${p.numero}</p>
+    <p><strong>Órgão Autuador:</strong> ${p.orgao}</p>
+    <p><strong>Artigo / Código:</strong> ${p.artigo}</p>
+    <p><strong>Descrição:</strong> ${p.descricao}</p>
+    <p><strong>Valor da Multa:</strong> R$ ${Number(p.valor).toFixed(2).replace('.',',')}</p>
+    <p><strong>Pontos:</strong> ${p.pontos}</p>
+    <p><strong>Data Infração:</strong> ${formatarData(p.data)}</p>
+    <p><strong>Local:</strong> ${p.local}</p>
+    <p><strong>Fase:</strong> ${p.fase}</p>
+    <p class="${dDef<=5?'alerta':''}"><strong>Prazo Defesa:</strong> ${formatarData(p.prazoDefesa)} — ${dDef} dias restantes${dDef<=5?' ⚠️':''}</p>
+    <p class="${dRec<=5?'alerta':''}"><strong>Prazo Recurso:</strong> ${formatarData(p.prazoRecurso)} — ${dRec} dias restantes${dRec<=5?' ⚠️':''}</p>
+  `;
+  document.getElementById('lista-processos').style.display = 'none';
+  document.getElementById('area-detalhes').style.display = 'block';
+};
+
+window.excluirProcesso = function(i) {
+  if(confirm('Excluir este processo?')) {
+    const l = lsGet('processos');
+    l.splice(i,1);
+    lsSet('processos', l);
     atualizarTela();
-});
-
-// === VEÍCULO ===
-document.getElementById('form-veiculo').addEventListener('submit',e=>{
-    e.preventDefault();
-    const v = {
-        placa:document.getElementById('veiculo-placa').value.trim().toUpperCase(),
-        modelo:document.getElementById('veiculo-modelo').value.trim(),
-        ano:document.getElementById('veiculo-ano').value.trim(),
-        cor:document.getElementById('veiculo-cor').value.trim(),
-        proprietario:document.getElementById('veiculo-proprietario').value.trim()
-    };
-    const lista = lsGet('veiculos');
-    lista.push(v); lsSet('veiculos',lista);
-    e.target.reset(); alert('✅ Veículo salvo!');
+  }
+};
+window.excluirVeiculo = function(i) {
+  if(confirm('Excluir?')) {
+    const l = lsGet('veiculos');
+    l.splice(i,1);
+    lsSet('veiculos', l);
     atualizarTela();
-});
-window.excluirVeiculo = i => { if(confirm('Excluir?')){ const l=lsGet('veiculos'); l.splice(i,1); lsSet('veiculos',l); atualizarTela(); } };
-
-// === PROCESSO ===
-document.getElementById('form-processo').addEventListener('submit',e=>{
-    e.preventDefault();
-    const p = {
-        condutor:document.getElementById('proc-condutor').value.trim(),
-        numero:document.getElementById('proc-numero').value.trim(),
-        orgao:document.getElementById('proc-orgao').value.trim(),
-        artigo:document.getElementById('proc-artigo').value.trim(),
-        descricao:document.getElementById('proc-descricao').value.trim(),
-        valor:document.getElementById('proc-valor').value,
-        pontos:document.getElementById('proc-pontos').value,
-        data:document.getElementById('proc-data').value,
-        local:document.getElementById('proc-local').value.trim(),
-        fase:document.getElementById('proc-fase').value,
-        prazoDefesa:document.getElementById('proc-prazo-defesa').value,
-        prazoRecurso:document.getElementById('proc-prazo-recurso').value
-    };
-    const lista = lsGet('processos');
-    lista.push(p); lsSet('processos',lista);
-    e.target.reset(); alert('✅ Processo salvo!');
+  }
+};
+window.excluirLei = function(i) {
+  if(confirm('Excluir?')) {
+    const l = lsGet('leis');
+    l.splice(i,1);
+    lsSet('leis', l);
     atualizarTela();
-});
-window.excluirProcesso = i => { if(confirm('Excluir?')){ const l=lsGet('processos'); l.splice(i,1); lsSet('processos',l); atualizarTela(); } };
+  }
+};
+window.excluirDoc = function(i) {
+  if(confirm('Excluir?')) {
+    const l = lsGet('docs');
+    l.splice(i,1);
+    lsSet('docs', l);
+    atualizarTela();
+  }
+};
 
-// === LEIS ===
-document.getElementById('form-lei').addEventListener('submit',e=>{
-    e.preventDefault();
-    const l = { codigo:document.getElementById('lei-codigo').value.trim(), descricao:document.getElementById('lei-descricao').value.trim() };
-    const lista = lsGet('leis'); lista.push(l); lsSet('leis',lista);
-    e.target.reset(); alert('✅ Artigo salvo!'); atualizarTela();
+document.getElementById('form-cliente').addEventListener('submit', e => {
+  e.preventDefault();
+  const c = {
+    nome: document.getElementById('cliente-nome').value.trim(),
+    cpf: document.getElementById('cliente-cpf').value.trim(),
+    endereco: document.getElementById('cliente-endereco').value.trim(),
+    telefone: document.getElementById('cliente-telefone').value.trim(),
+    email: document.getElementById('cliente-email').value.trim()
+  };
+  lsSet('clientes', [c]);
+  e.target.reset();
+  alert('✅ Cliente salvo!');
+  atualizarTela();
 });
-window.excluirLei = i => { if(confirm('Excluir?')){ const l=lsGet('leis'); l.splice(i,1); lsSet('leis',l); atualizarTela(); } };
 
-// === DOCUMENTOS ===
-document.getElementById('form-doc').addEventListener('submit',e=>{
-    e.preventDefault();
-    const d = { nome:document.getElementById('doc-nome').value.trim(), desc:document.getElementById('doc-desc').value.trim() };
-    const lista = lsGet('docs'); lista.push(d); lsSet('docs',lista);
-    e.target.reset(); alert('✅ Documento salvo!'); atualizarTela();
+document.getElementById('form-veiculo').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = {
+    placa: document.getElementById('veiculo-placa').value.trim().toUpperCase(),
+    modelo: document.getElementById('veiculo-modelo').value.trim(),
+    ano: document.getElementById('veiculo-ano').value.trim(),
+    cor: document.getElementById('veiculo-cor').value.trim(),
+    proprietario: document.getElementById('veiculo-proprietario').value
+  };
+  const l = lsGet('veiculos');
+  l.push(v); lsSet('veiculos', l);
+  e.target.reset();
+  alert('✅ Veículo salvo!');
+  atualizarTela();
 });
-window.excluirDoc = i => { if(confirm('Excluir?')){ const l=lsGet('docs'); l.splice(i,1); lsSet('docs',l); atualizarTela(); } };
 
-// === ATUALIZAR TUDO ===
-function atualizarTela(){
-    // Início
-    const processos = lsGet('processos');
-    document.getElementById('qtd-processos').textContent = processos.length;
-    const hj = new Date(); hj.setHours(0,0,0,0);
-    const abertos = processos.filter(p=>new Date(p.prazoDefesa)>=hj || new Date(p.prazoRecurso)>=hj);
-    document.getElementById('qtd-prazos').textContent = abertos.length;
-    const prazosHTML = processos.sort((a,b)=>new Date(a.prazoDefesa)-new Date(b.prazoDefesa)).map(p=>{
-        const d = diasAte(p.prazoDefesa);
-        return `<div class="item"><strong>${p.numero} — ${p.condutor}</strong><p>Defesa: ${formatarData(p.prazoDefesa)} (${d} dias) ${d<=5?'⚠️':''}</p></div>`;
+document.getElementById('form-processo').addEventListener('submit', e => {
+  e.preventDefault();
+  const p = {
+    veiculo: document.getElementById('proc-veiculo').value,
+    numero: document.getElementById('proc-numero').value.trim(),
+    orgao: document.getElementById('proc-orgao').value.trim(),
+    artigo: document.getElementById('proc-artigo').value.trim(),
+    descricao: document.getElementById('proc-descricao').value.trim(),
+    valor: document.getElementById('proc-valor').value,
+    pontos: document.getElementById('proc-pontos').value,
+    data: document.getElementById('proc-data').value,
+    local: document.getElementById('proc-local').value.trim(),
+    fase: document.getElementById('proc-fase').value,
+    prazoDefesa: document.getElementById('proc-prazo-defesa').value,
+    prazoRecurso: document.getElementById('proc-prazo-recurso').value
+  };
+  const l = lsGet('processos');
+  l.push(p); lsSet('processos', l);
+  e.target.reset();
+  alert('✅ Processo salvo! Veja na página Início!');
+  atualizarTela();
+});
+
+document.getElementById('form-lei').addEventListener('submit', e => {
+  e.preventDefault();
+  const l = { codigo: document.getElementById('lei-codigo').value.trim(), descricao: document.getElementById('lei-descricao').value.trim() };
+  const lista = lsGet('leis'); lista.push(l); lsSet('leis', lista);
+  e.target.reset(); alert('✅ Salvo!'); atualizarTela();
+});
+
+document.getElementById('form-doc').addEventListener('submit', e => {
+  e.preventDefault();
+  const d = { nome: document.getElementById('doc-nome').value.trim(), desc: document.getElementById('doc-desc').value.trim() };
+  const lista = lsGet('docs'); lista.push(d); lsSet('docs', lista);
+  e.target.reset(); alert('✅ Salvo!'); atualizarTela();
+});
+
+function atualizarTela() {
+  carregarOpcoes();
+  const processos = lsGet('processos');
+
+  // Atualiza contadores
+  document.getElementById('qtd-processos').textContent = processos.length;
+  const hj = new Date(); hj.setHours(0,0,0,0);
+  const abertos = processos.filter(p => new Date(p.prazoDefesa) >= hj || new Date(p.prazoRecurso) >= hj);
+  document.getElementById('qtd-prazos').textContent = abertos.length;
+
+  // Lista de próximos prazos
+  const prazosHTML = processos
+    .sort((a,b) => new Date(a.prazoDefesa) - new Date(b.prazoDefesa))
+    .map(p => {
+      const d = diasAte(p.prazoDefesa);
+      return `<div class="item"><strong>${p.numero} — ${p.veiculo}</strong><p>Defesa: ${formatarData(p.prazoDefesa)} (${d} dias) ${d<=5?'⚠️':''}</p></div>`;
     }).join('');
-    document.getElementById('lista-prazos').innerHTML = prazosHTML || '<p class="vazio">Nenhum prazo cadastrado.</p>';
+  document.getElementById('lista-prazos').innerHTML = prazosHTML || '<p class="vazio">Nenhum prazo cadastrado.</p>';
 
-    // Cliente
-    const cli = lsGet('clientes')[0];
-    document.getElementById('dados-cliente').innerHTML = cli ? `<div class="item">
-        <p><strong>Nome:</strong> ${cli.nome}</p><p><strong>CPF/CNPJ:</strong> ${cli.cpf}</p>
-        <p><strong>Endereço:</strong> ${cli.endereco}</p><p><strong>Telefone:</strong> ${cli.telefone}</p><p><strong>E-mail:</strong> ${cli.email}</p>
+  // ✅ LISTA DE PROCESSOS ✅
+  if(processos.length === 0) {
+    document.getElementById('lista-processos').innerHTML = '<p class="vazio">Nenhum processo cadastrado.</p>';
+  } else {
+    let html = '';
+    for(let i=0; i<processos.length; i++) {
+      const p = processos[i];
+      html += `
+        <div class="item">
+          <p><strong>Nº Auto:</strong> ${p.numero}</p>
+          <p><strong>Veículo:</strong> ${p.veiculo}</p>
+          <p><strong>Infração:</strong> ${p.descricao}</p>
+          <p><strong>Valor:</strong> R$ ${Number(p.valor).toFixed(2).replace('.',',')} — <strong>Pontos:</strong> ${p.pontos}</p>
+          <div class="botoes-lado">
+            <button class="btn-verde" onclick="verDetalhes(${i})">👁️ Ver Detalhes</button>
+            <button class="btn-vermelho" onclick="excluirProcesso(${i})">🗑️ Excluir</button>
+          </div>
+        </div>
+      `;
+    }
+    document.getElementById('lista-processos').innerHTML = html;
+  }
+
+  // Cliente
+  const cli = lsGet('clientes')[0];
+  document.getElementById('dados-cliente').innerHTML = cli ? `
+    <div class="item">
+      <p><strong>Nome:</strong> ${cli.nome}</p>
+      <p><strong>CPF/CNPJ:</strong> ${cli.cpf}</p>
+      <p><strong>Endereço:</strong> ${cli.endereco}</p>
+      <p><strong>Telefone:</strong> ${cli.telefone}</p>
+      <p><strong>E-mail:</strong> ${cli.email}</p>
     </div>` : '<p class="vazio">Nenhum cliente salvo.</p>';
 
-    // Veículos
-    const veiculos = lsGet('veiculos');
-    document.getElementById('lista-veiculos').innerHTML = veiculos.length ? veiculos.map((v,i)=>`<div class="item">
-        <p><strong>Placa:</strong> ${v.placa}</p><p><strong>Modelo:</strong> ${v.modelo} — ${v.ano} — ${v.cor}</p>
-        <p><strong>Proprietário:</strong> ${v.proprietario}</p>
-        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirVeiculo(${i})">🗑️ Excluir</button></div>
-    </div>`).join('') : '<p class="vazio">Nenhum veículo cadastrado.</p>';
+  // Veículos
+  const veiculos = lsGet('veiculos');
+  if(veiculos.length === 0) {
+    document.getElementById('lista-veiculos').innerHTML = '<p class="vazio">Nenhum veículo cadastrado.</p>';
+  } else {
+    let html = '';
+    for(let i=0; i<veiculos.length; i++) {
+      const v = veiculos[i];
+      html += `
+        <div class="item">
+          <p><strong>Placa:</strong> ${v.placa}</p>
+          <p><strong>Modelo:</strong> ${v.modelo} — ${v.ano} — ${v.cor}</p>
+          <p><strong>Proprietário:</strong> ${v.proprietario || 'Não informado'}</p>
+          <div class="botoes-lado"><button class="btn-vermelho" onclick="excluirVeiculo(${i})">🗑️ Excluir</button></div>
+        </div>`;
+    }
+    document.getElementById('lista-veiculos').innerHTML = html;
+  }
 
-    // Processos
-    document.getElementById('lista-processos').innerHTML = processos.length ? processos.map((p,i)=>`<div class="item">
-        <p><strong>Condutor:</strong> ${p.condutor}</p><p><strong>Nº Auto:</strong> ${p.numero}</p>
-        <p><strong>Órgão:</strong> ${p.orgao}</p><p><strong>Artigo:</strong> ${p.artigo}</p><p><strong>Descrição:</strong> ${p.descricao}</p>
-        <p><strong>Valor:</strong> R$ ${parseFloat(p.valor).toFixed(2).replace('.',',')} — <strong>Pontos:</strong> ${p.pontos}</p>
-        <p><strong>Data Infração:</strong> ${formatarData(p.data)} — <strong>Local:</strong> ${p.local}</p>
-        <p><strong>Fase:</strong> ${p.fase}</p><p><strong>Prazo Defesa:</strong> ${formatarData(p.prazoDefesa)} — <strong>Recurso:</strong> ${formatarData(p.prazoRecurso)}</p>
-        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirProcesso(${i})">🗑️ Excluir</button></div>
-    </div>`).join('') : '<p class="vazio">Nenhum processo cadastrado.</p>';
+  // Leis
+  const leis = lsGet('leis');
+  if(leis.length === 0) {
+    document.getElementById('lista-leis').innerHTML = '<p class="vazio">Nenhum artigo cadastrado.</p>';
+  } else {
+    let html = '';
+    for(let i=0; i<leis.length; i++) {
+      const l = leis[i];
+      html += `
+        <div class="item">
+          <p><strong>${l.codigo}</strong></p><p>${l.descricao}</p>
+          <div class="botoes-lado"><button class="btn-vermelho" onclick="excluirLei(${i})">🗑️ Excluir</button></div>
+        </div>`;
+    }
+    document.getElementById('lista-leis').innerHTML = html;
+  }
 
-    // Leis
-    const leis = lsGet('leis');
-    document.getElementById('lista-leis').innerHTML = leis.length ? leis.map((l,i)=>`<div class="item">
-        <p><strong>${l.codigo}</strong></p><p>${l.descricao}</p>
-        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirLei(${i})">🗑️ Excluir</button></div>
-    </div>`).join('') : '<p class="vazio">Nenhum artigo cadastrado.</p>';
-
-    // Documentos
-    const docs = lsGet('docs');
-    document.getElementById('lista-docs').innerHTML = docs.length ? docs.map((d,i)=>`<div class="item">
-        <p><strong>${d.nome}</strong></p><p>${d.desc}</p>
-        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirDoc(${i})">🗑️ Excluir</button></div>
-    </div>`).join('') : '<p class="vazio">Nenhum documento salvo.</p>';
+  // Documentos
+  const docs = lsGet('docs');
+  if(docs.length === 0) {
+    document.getElementById('lista-docs').innerHTML = '<p class="vazio">Nenhum documento salvo.</p>';
+  } else {
+    let html = '';
+    for(let i=0; i<docs.length; i++) {
+      const d = docs[i];
+      html += `
+        <div class="item">
+          <p><strong>${d.nome}</strong></p><p>${d.desc}</p>
+          <div class="botoes-lado"><button class="btn-vermelho" onclick="excluirDoc(${i})">🗑️ Excluir</button></div>
+        </div>`;
+    }
+    document.getElementById('lista-docs').innerHTML = html;
+  }
 }
 
 window.onload = atualizarTela;
 </script>
 
 </body>
-    </html>
-    
+</html>
