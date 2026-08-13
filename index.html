@@ -17,7 +17,8 @@
         form { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 2rem; }
         h2 { margin: 1.5rem 0 1rem; color: #162c47; font-size: 1.15rem; }
         label { display: block; margin: 1rem 0 0.4rem; font-weight: 500; color: #334155; }
-        input, select { width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fcfcfc; }
+        input, select, textarea { width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fcfcfc; }
+        textarea { min-height: 120px; resize: vertical; } /* Caixa de texto maior na aba Leis */
         button { margin-top: 1.5rem; padding: 1rem; width: 100%; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
         .btn-verde { background: #10b981; padding: 0.5rem 0.8rem; width: auto; font-size: 0.85rem; margin-top: 0; color: white; border: none; border-radius: 6px; cursor: pointer; }
         .btn-vermelho { background: #dc2626; padding: 0.5rem 0.8rem; width: auto; font-size: 0.85rem; margin-top: 0; color: white; border: none; border-radius: 6px; cursor: pointer; }
@@ -69,7 +70,7 @@
         </div>
     </div>
 
-    <!-- Cliente -->
+    <!-- Cliente → COM BOTÃO EXCLUIR -->
     <div id="pagina-cliente" class="pagina">
         <h2>Dados do Cliente</h2>
         <form id="form-cliente">
@@ -85,6 +86,7 @@
             <input type="email" id="cliente-email" placeholder="email@exemplo.com">
             <button type="submit">✅ Salvar Cliente</button>
         </form>
+        <h2>Cliente Cadastrado</h2>
         <div id="dados-cliente"></div>
     </div>
 
@@ -106,6 +108,7 @@
             </select>
             <button type="submit">✅ Salvar Veículo</button>
         </form>
+        <h2>Veículos Cadastrados</h2>
         <div id="lista-veiculos"></div>
     </div>
 
@@ -147,14 +150,14 @@
         </form>
     </div>
 
-    <!-- Leis -->
+    <!-- Leis → CAIXA DE TEXTO MAIOR -->
     <div id="pagina-leis" class="pagina">
         <h2>Base Legal</h2>
         <form id="form-lei">
             <label>Artigo / Código</label>
             <input type="text" id="lei-codigo" placeholder="Ex: Art. 180">
             <label>Descrição</label>
-            <textarea id="lei-descricao" rows="4" placeholder="Texto da lei ou artigo"></textarea>
+            <textarea id="lei-descricao" placeholder="Texto da lei ou artigo"></textarea>
             <button type="submit">✅ Salvar Artigo</button>
         </form>
         <h2>Artigos Cadastrados</h2>
@@ -168,7 +171,7 @@
             <label>Nome / Título do Documento</label>
             <input type="text" id="doc-nome" placeholder="Ex: Auto de Infração nº 123">
             <label>Descrição / Observações</label>
-            <textarea id="doc-desc" rows="3" placeholder="Informações sobre o documento"></textarea>
+            <textarea id="doc-desc" placeholder="Informações sobre o documento"></textarea>
             <button type="submit">✅ Salvar Documento</button>
         </form>
         <h2>Documentos Salvos</h2>
@@ -276,7 +279,7 @@ window.excluirProcesso = function(i) {
   }
 };
 window.excluirVeiculo = function(i) {
-  if(confirm('Excluir?')) {
+  if(confirm('Excluir este veículo?')) {
     const l = lsGet('veiculos');
     l.splice(i,1);
     lsSet('veiculos', l);
@@ -284,7 +287,7 @@ window.excluirVeiculo = function(i) {
   }
 };
 window.excluirLei = function(i) {
-  if(confirm('Excluir?')) {
+  if(confirm('Excluir este artigo?')) {
     const l = lsGet('leis');
     l.splice(i,1);
     lsSet('leis', l);
@@ -292,10 +295,16 @@ window.excluirLei = function(i) {
   }
 };
 window.excluirDoc = function(i) {
-  if(confirm('Excluir?')) {
+  if(confirm('Excluir este documento?')) {
     const l = lsGet('docs');
     l.splice(i,1);
     lsSet('docs', l);
+    atualizarTela();
+  }
+};
+window.excluirCliente = function() {
+  if(confirm('Excluir os dados do cliente?')) {
+    lsSet('clientes', []);
     atualizarTela();
   }
 };
@@ -356,29 +365,37 @@ document.getElementById('form-processo').addEventListener('submit', e => {
 
 document.getElementById('form-lei').addEventListener('submit', e => {
   e.preventDefault();
-  const l = { codigo: document.getElementById('lei-codigo').value.trim(), descricao: document.getElementById('lei-descricao').value.trim() };
-  const lista = lsGet('leis'); lista.push(l); lsSet('leis', lista);
-  e.target.reset(); alert('✅ Salvo!'); atualizarTela();
+  const l = {
+    codigo: document.getElementById('lei-codigo').value.trim(),
+    descricao: document.getElementById('lei-descricao').value.trim()
+  };
+  const lista = lsGet('leis');
+  lista.push(l); lsSet('leis', lista);
+  e.target.reset(); alert('✅ Artigo salvo!'); atualizarTela();
 });
 
 document.getElementById('form-doc').addEventListener('submit', e => {
   e.preventDefault();
-  const d = { nome: document.getElementById('doc-nome').value.trim(), desc: document.getElementById('doc-desc').value.trim() };
-  const lista = lsGet('docs'); lista.push(d); lsSet('docs', lista);
-  e.target.reset(); alert('✅ Salvo!'); atualizarTela();
+  const d = {
+    nome: document.getElementById('doc-nome').value.trim(),
+    desc: document.getElementById('doc-desc').value.trim()
+  };
+  const lista = lsGet('docs');
+  lista.push(d); lsSet('docs', lista);
+  e.target.reset(); alert('✅ Documento salvo!'); atualizarTela();
 });
 
 function atualizarTela() {
   carregarOpcoes();
   const processos = lsGet('processos');
 
-  // Atualiza contadores
+  // Contadores
   document.getElementById('qtd-processos').textContent = processos.length;
   const hj = new Date(); hj.setHours(0,0,0,0);
   const abertos = processos.filter(p => new Date(p.prazoDefesa) >= hj || new Date(p.prazoRecurso) >= hj);
   document.getElementById('qtd-prazos').textContent = abertos.length;
 
-  // Lista de próximos prazos
+  // Próximos Prazos
   const prazosHTML = processos
     .sort((a,b) => new Date(a.prazoDefesa) - new Date(b.prazoDefesa))
     .map(p => {
@@ -387,7 +404,7 @@ function atualizarTela() {
     }).join('');
   document.getElementById('lista-prazos').innerHTML = prazosHTML || '<p class="vazio">Nenhum prazo cadastrado.</p>';
 
-  // ✅ LISTA DE PROCESSOS ✅
+  // Lista de Processos
   if(processos.length === 0) {
     document.getElementById('lista-processos').innerHTML = '<p class="vazio">Nenhum processo cadastrado.</p>';
   } else {
@@ -410,16 +427,24 @@ function atualizarTela() {
     document.getElementById('lista-processos').innerHTML = html;
   }
 
-  // Cliente
+  // Cliente → COM BOTÃO EXCLUIR
   const cli = lsGet('clientes')[0];
-  document.getElementById('dados-cliente').innerHTML = cli ? `
-    <div class="item">
-      <p><strong>Nome:</strong> ${cli.nome}</p>
-      <p><strong>CPF/CNPJ:</strong> ${cli.cpf}</p>
-      <p><strong>Endereço:</strong> ${cli.endereco}</p>
-      <p><strong>Telefone:</strong> ${cli.telefone}</p>
-      <p><strong>E-mail:</strong> ${cli.email}</p>
-    </div>` : '<p class="vazio">Nenhum cliente salvo.</p>';
+  if(!cli) {
+    document.getElementById('dados-cliente').innerHTML = '<p class="vazio">Nenhum cliente salvo.</p>';
+  } else {
+    document.getElementById('dados-cliente').innerHTML = `
+      <div class="item">
+        <p><strong>Nome:</strong> ${cli.nome}</p>
+        <p><strong>CPF/CNPJ:</strong> ${cli.cpf}</p>
+        <p><strong>Endereço:</strong> ${cli.endereco}</p>
+        <p><strong>Telefone:</strong> ${cli.telefone}</p>
+        <p><strong>E-mail:</strong> ${cli.email}</p>
+        <div class="botoes-lado">
+          <button class="btn-vermelho" onclick="excluirCliente()">🗑️ Excluir Cliente</button>
+        </div>
+      </div>
+    `;
+  }
 
   // Veículos
   const veiculos = lsGet('veiculos');
