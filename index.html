@@ -1,1 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Multas e Processos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        :root { --azul:#2563eb; --verde:#16a34a; --amarelo:#f59e0b; --vermelho:#dc2626; --cinza:#f1f5f9; --escuro:#1e293b; }
+        body { background: var(--cinza); padding-bottom: 80px; }
+        header { background: var(--escuro); color:white; padding:16px; position:sticky; top:0; z-index:100; }
+        header h1 { font-size:18px; }
+        nav { position:fixed; bottom:0; left:0; right:0; background:white; display:flex; justify-content:space-around; padding:8px 0; box-shadow:0 -2px 8px rgba(0,0,0,.1); z-index:100; }
+        nav button { background:none; border:none; font-size:11px; color:#64748b; padding:6px; cursor:pointer; }
+        nav button.ativo { color:var(--azul); font-weight:bold; }
+        main { padding:16px; }
+        .pagina { display:none; }
+        .pagina.ativa { display:block; }
+        .cartao { background:white; border-radius:10px; padding:16px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,.05); }
+        .grade { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+        .card-qtd { text-align:center; padding:16px; border-radius:10px; color:white; }
+        .form-grupo { margin-bottom:12px; }
+        label { display:block; margin-bottom:4px; font-size:14px; color:#334155; }
+        input, select, textarea { width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size:15px; }
+        button.botao { width:100%; padding:12px; border:none; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; margin-top:8px; }
+        .botao-primario { background:var(--azul); color:white; }
+        .botao-sucesso { background:var(--verde); color:white; }
+        .botao-vermelho { background:var(--vermelho); color:white; }
+        .botao-amarelo { background:var(--amarelo); color:white; }
+        .lista-item { padding:12px; border-bottom:1px solid #eee; }
+        .etiqueta { display:inline-block; padding:3px 8px; border-radius:12px; font-size:12px; color:white; }
+        .et-defesa { background:var(--azul); }
+        .et-jari { background:var(--amarelo); }
+        .et-cetran { background:#8b5cf6; }
+        .et-concluido { background:var(--verde); }
+        .vencendo { color:var(--vermelho); font-weight:bold; }
+        .linha { display:flex; justify-content:space-between; margin:4px 0; font-size:14px; }
+        .linha strong { color:#334155; }
+        .btn-pequeno { padding:6px 10px; font-size:13px; border-radius:6px; border:none; cursor:pointer; margin:2px; }
+        .oculto { display:none !important; }
+    </style>
+</head>
+<body>
+
+<header><h1>⚖️ Gestão de Multas e Processos</h1></header>
+
+<main>
+    <!-- PÁGINA INÍCIO / PAINEL -->
+    <div class="pagina ativa" id="pag-inicio">
+        <h2 style="margin-bottom:16px;">Painel de Acompanhamento</h2>
+        <div class="grade">
+            <div class="card-qtd" style="background:var(--azul)">
+                <div id="qtd-processos">0</div>
+                <div style="font-size:13px; opacity:0.9;">Processos</div>
+            </div>
+            <div class="card-qtd" style="background:var(--amarelo)">
+                <div id="qtd-prazos">0</div>
+                <div style="font-size:13px; opacity:0.9;">Prazos a vencer</div>
+            </div>
+        </div>
+        <div class="cartao">
+            <h3>📋 Próximos Prazos</h3>
+            <div id="lista-prazos" style="margin-top:10px;">Nenhum prazo cadastrado.</div>
+        </div>
+    </div>
+
+    <!-- PÁGINA CLIENTES -->
+    <div class="pagina" id="pag-clientes">
+        <h2 style="margin-bottom:12px;">👤 Clientes</h2>
+        <div class="cartao">
+            <div class="form-grupo"><label>Nome Completo</label><input id="cli-nome" type="text"></div>
+            <div class="form-grupo"><label>CPF / CNPJ</label><input id="cli-cpf" type="text"></div>
+            <div class="form-grupo"><label>Endereço</label><input id="cli-endereco" type="text"></div>
+            <div class="form-grupo"><label>Telefone</label><input id="cli-tel" type="text"></div>
+            <div class="form-grupo"><label>E-mail</label><input id="cli-email" type="email"></div>
+            <button class="botao botao-primario" onclick="salvarCliente()">✅ Salvar Cliente</button>
+        </div>
+        <div id="lista-clientes"></div>
+    </div>
+
+    <!-- PÁGINA VEÍCULOS -->
+    <div class="pagina" id="pag-veiculos">
+        <h2 style="margin-bottom:12px;">🚗 Veículos</h2>
+        <div class="cartao">
+            <div class="form-grupo"><label>Proprietário</label><select id="vei-cliente"><option value="">Selecione um cliente</option></select></div>
+            <div class="form-grupo"><label>Placa</label><input id="vei-placa" type="text"></div>
+            <div class="form-grupo"><label>RENAVAM</label><input id="vei-renavam" type="text"></div>
+            <div class="form-grupo"><label>Marca / Modelo</label><input id="vei-modelo" type="text"></div>
+            <div class="form-grupo"><label>Ano</label><input id="vei-ano" type="number"></div>
+            <button class="botao botao-primario" onclick="salvarVeiculo()">✅ Salvar Veículo</button>
+        </div>
+        <div id="lista-veiculos"></div>
+    </div>
+
+    <!-- PÁGINA PROCESSOS -->
+    <div class="pagina" id="pag-processos">
+        <h2 style="margin-bottom:12px;">📋 Infrações / Processos</h2>
+        <div class="cartao">
+            <div class="form-grupo"><label>Veículo</label><select id="proc-veiculo"><option value="">Selecione um veículo</option></select></div>
+            <div class="form-grupo"><label>Nº do Auto de Infração</label><input id="proc-numero" type="text"></div>
+            <div class="form-grupo"><label>Órgão Autuador</label><input id="proc-orgao" type="text" placeholder="Ex: DETRAN-SP"></div>
+            <div class="form-grupo"><label>Artigo / Código Infração</label><input id="proc-artigo" type="text" placeholder="Ex: Art. 180"></div>
+            <div class="form-grupo"><label>Descrição da Infração</label><textarea id="proc-descricao" rows="2"></textarea></div>
+            <div class="form-grupo"><label>Valor da Multa (R$)</label><input id="proc-valor" type="number" step="0.01"></div>
+            <div class="form-grupo"><label>Pontos na Carteira</label><input id="proc-pontos" type="number"></div>
+            <div class="form-grupo"><label>Data da Infração</label><input id="proc-data" type="date"></div>
+            <div class="form-grupo"><label>Local da Infração</label><input id="proc-local" type="text"></div>
+            <div class="form-grupo"><label>Fase Processual</label>
+                <select id="proc-fase">
+                    <option value="defesa">Defesa Prévia</option>
+                    <option value="jari">Recurso JARI</option>
+                    <option value="cetran">Recurso CETRAN</option>
+                    <option value="concluido">Concluído</option>
+                </select>
+            </div>
+            <div class="form-grupo"><label>Prazo para Defesa</label><input id="proc-prazo-defesa" type="date"></div>
+            <div class="form-grupo"><label>Prazo para Recurso</label><input id="proc-prazo-recurso" type="date"></div>
+            <button class="botao botao-primario" onclick="salvarProcesso()">✅ Salvar Processo</button>
+        </div>
+        <h3 style="margin:20px 0 10px;">Lista de Processos</h3>
+        <div id="lista-processos"></div>
+    </div>
+
+    <!-- PÁGINA BIBLIOTECA -->
+    <div class="pagina" id="pag-biblioteca">
+        <h2 style="margin-bottom:12px;">📚 Biblioteca Jurídica</h2>
+        <div class="cartao">
+            <div class="form-grupo"><label>Título</label><input id="bib-titulo" type="text"></div>
+            <div class="form-grupo"><label>Tipo</label>
+                <select id="bib-tipo">
+                    <option value="lei">Lei / Artigo CTB</option>
+                    <option value="resolucao">Resolução CONTRAN</option>
+                    <option value="modelo">Modelo de Documento</option>
+                </select>
+            </div>
+            <div class="form-grupo"><label>Conteúdo</label><textarea id="bib-conteudo" rows="6"></textarea></div>
+            <button class="botao botao-primario" onclick="salvarBiblioteca()">✅ Salvar</button>
+        </div>
+        <div id="lista-biblioteca"></div>
+    </div>
+
+    <!-- PÁGINA DOCUMENTOS -->
+    <div class="pagina" id="pag-documentos">
+        <h2 style="margin-bottom:12px;">📄 Gerar Documentos</h2>
+        <p style="color:#64748b; margin-bottom:12px;">Selecione um processo para gerar Defesa Prévia em PDF:</p>
+        <div class="form-grupo"><label>Processo</label><select id="doc-processo"><option value="">Selecione...</option></select></div>
+        <button class="botao botao-sucesso" onclick="gerarDefesaPDF()">📄 Gerar Defesa Prévia</button>
+        <div id="resultado-doc" style="margin-top:16px;"></div>
+    </div>
+</main>
+
+<nav>
+    <button class="ativo" onclick="irPara('inicio')">📊 Início</button>
+    <button onclick="irPara('clientes')">👤 Cliente</button>
+    <button onclick="irPara('veiculos')">🚗 Veículo</button>
+    <button onclick="irPara('processos')">📋 Processo</button>
+    <button onclick="irPara('biblioteca')">📚 Leis</button>
+    <button onclick="irPara('documentos')">📄 Doc</button>
+</nav>
+
+<script>
+// ========== ARMAZENAMENTO NO PRÓPRIO CELULAR ==========
+let clientes = JSON.parse(localStorage.getItem('clientes') || '[]');
+let veiculos = JSON.parse(localStorage.getItem('veiculos') || '[]');
+let processos = JSON.parse(localStorage.getItem('processos') || '[]');
+let biblioteca = JSON.parse(localStorage.getItem('biblioteca') || '[]');
+
+function salvarDados(){
+    localStorage.setItem('clientes', JSON.stringify(clientes));
+    localStorage.setItem('veiculos', JSON.stringify(veiculos));
+    localStorage.setItem('processos', JSON.stringify(processos));
+    localStorage.setItem('biblioteca', JSON.stringify(biblioteca));
+    atualizarTudo();
+}
+
+// ========== NAVEGAÇÃO ==========
+function irPara(nome){
+    document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('ativo'));
+    document.getElementById('pag-'+nome).classList.add('ativa');
+    event.target.classList.add('ativo');
+    atualizarTudo();
+}
+
+// ========== CLIENTES ==========
+function salvarCliente(){
+    let c = {
+        id: Date.now(),
+        nome: document.getElementById('cli-nome').value,
+        cpf: document.getElementById('cli-cpf').value,
+        endereco: document.getElementById('cli-endereco').value,
+        telefone: document.getElementById('cli-tel').value,
+        email: document.getElementById('cli-email').value
+    };
+    if(!c.nome) return alert('Digite o nome!');
+    clientes.push(c);
+    salvarDados();
+    document.getElementById('cli-nome').value=''; document.getElementById('cli-cpf').value='';
+    document.getElementById('cli-endereco').value=''; document.getElementById('cli-tel').value='';
+    document.getElementById('cli-email').value='';
+}
+function renderClientes(){
+    let html='';
+    clientes.forEach(c=>{
+        html += `<div class="cartao lista-item">
+            <div><strong>${c.nome}</strong></div>
+            <div style="font-size:13px; color:#64748b;">${c.cpf} | ${c.telefone}</div>
+            <button class="btn-pequeno botao-vermelho" onclick="excluirItem('clientes',${c.id})">Excluir</button>
+        </div>`;
+    });
+    document.getElementById('lista-clientes').innerHTML = html;
+}
+
+// ========== VEÍCULOS ==========
+function salvarVeiculo(){
+    let v = {
+        id: Date.now(),
+        clienteId: document.getElementById('vei-cliente').value,
+        placa: document.getElementById('vei-placa').value.toUpperCase(),
+        renavam: document.getElementById('vei-renavam').value,
+        modelo: document.getElementById('vei-modelo').value,
+        ano: document.getElementById('vei-ano').value
+    };
+    if(!v.placa || !v.clienteId) return alert('Preencha proprietário e placa!');
+    veiculos.push(v);
+    salvarDados();
+    document.getElementById('vei-placa').value=''; document.getElementById('vei-renavam').value='';
+    document.getElementById('vei-modelo').value=''; document.getElementById('vei-ano').value='';
+}
+function renderVeiculos(){
+    let html='';
+    veiculos.forEach(v=>{
+        let dono = clientes.find(c=>c.id == v.clienteId);
+        html += `<div class="cartao lista-item">
+            <div><strong>${v.placa}</strong> — ${v.modelo} / ${v.ano}</div>
+            <div style="font-size:13px; color:#64748b;">Proprietário: ${dono?dono.nome:'Desconhecido'} | RENAVAM: ${v.renavam}</div>
+            <button class="btn-pequeno botao-vermelho" onclick="excluirItem('veiculos',${v.id})">Excluir</button>
+        </div>`;
+    });
+    document.getElementById('lista-veiculos').innerHTML = html;
+}
+
+// ========== PROCESSOS ==========
+function salvarProcesso(){
+    let p = {
+        id: Date.now(),
+        veiculoId: document.getElementById('proc-veiculo').value,
+        numero: document.getElementById('proc-numero').value,
+        orgao: document.getElementById('proc-orgao').value,
+        artigo: document.getElementById('proc-artigo').value,
+        descricao: document.getElementById('proc-descricao').value,
+        valor: document.getElementById('proc-valor').value,
+        pontos: document.getElementById('proc-pontos').value,
+        data: document.getElementById('proc-data').value,
+        local: document.getElementById('proc-local').value,
+        fase: document.getElementById('proc-fase').value,
+        prazoDefesa: document.getElementById('proc-prazo-defesa').value,
+        prazoRecurso: document.getElementById('proc-prazo-recurso').value
+    };
+    if(!p.numero || !p.veiculoId) return alert('Preencha o nº do Auto e selecione o veículo!');
+    processos.push(p);
+    salvarDados();
+    document.getElementById('proc-numero').value=''; document.getElementById('proc-orgao').value='';
+    document.getElementById('proc-artigo').value=''; document.getElementById('proc-descricao').value='';
+    document.getElementById('proc-valor').value=''; document.getElementById('proc-pontos').value='';
+    document.getElementById('proc-data').value=''; document.getElementById('proc-local').value='';
+    document.getElementById('proc-prazo-defesa').value=''; document.getElementById('proc-prazo-recurso').value='';
+}
+function faseNome(fase){
+    return {defesa:'Defesa Prévia',jari:'Recurso JARI',cetran:'Recurso CETRAN',concluido:'Concluído'}[fase]||fase;
+}
+function faseClasse(fase){
+    return {defesa:'et-defesa',jari:'et-jari',cetran:'et-cetran',concluido:''}[fase]||'';
+}
+function renderProcessos(){
+    let hoje = new Date().toISOString().split('T')[0];
+    let html='';
+    processos.forEach(p=>{
+        let vei = veiculos.find(v=>v.id == p.veiculoId);
+        let dono = vei ? clientes.find(c=>c.id == vei.clienteId) : null;
+        let vencendo = p.prazoDefesa && p.prazoDefesa < hoje ? 'vencendo' : '';
+        html += `<div class="cartao lista-item">
+            <div class="linha"><strong>Nº Auto:</strong> ${p.numero}</div>
+            <div class="linha"><strong>Placa:</strong> ${vei?vei.placa:'—'}</div>
+            <div class="linha"><strong>Proprietário:</strong> ${dono?dono.nome:'—'}</div>
+            <div class="linha"><strong>Infração:</strong> ${p.artigo} — ${p.descricao}</div>
+            <div class="linha"><strong>Valor / Pontos:</strong> R$ ${p.valor} / ${p.pontos} pts</div>
+            <div class="linha"><strong>Fase:</strong> <span class="etiqueta ${faseClasse(p.fase)}">${faseNome(p.fase)}</span></div>
+            <div class="linha ${vencendo}"><strong>Prazo Defesa:</strong> ${p.prazoDefesa||'—'}</div>
+            <button class="btn-pequeno botao-amarelo" onclick="gerarDefesaPDF(${p.id})">Gerar PDF</button>
+            <button class="btn-pequeno botao-vermelho" onclick="excluirItem('processos',${p.id})">Excluir</button>
+        </div>`;
+    });
+    document.getElementById('lista-processos').innerHTML = html || '<p style="text-align:center; color:#666; padding:15px;">Nenhum processo cadastrado.</p>';
+}
+
+// ========== BIBLIOTECA JURÍDICA ==========
+function salvarBiblioteca(){
+    let b = {
+        id: Date.now(),
+        titulo: document.getElementById('bib-titulo').value,
+        tipo: document.getElementById('bib-tipo').value,
+        conteudo: document.getElementById('bib-conteudo').value
+    };
+    if(!b.titulo) return alert('Digite o título!');
+    biblioteca.push(b);
+    salvarDados();
+    document.getElementById('bib-titulo').value=''; document.getElementById('bib-conteudo').value='';
+}
+function renderBiblioteca(){
+    let html='';
+    biblioteca.forEach(b=>{
+        html += `<div class="cartao lista-item">
+            <div><strong>${b.titulo}</strong> <small style="color:#666;">(${b.tipo})</small></div>
+            <p style="margin-top:8px; font-size:14px; white-space:pre-wrap; color:#333;">${b.conteudo}</p>
+            <button class="btn-pequeno botao-vermelho" onclick="excluirItem('biblioteca',${b.id})">Excluir</button>
+        </div>`;
+    });
+    document.getElementById('lista-biblioteca').innerHTML = html || '<p style="text-align:center; color:#666; padding:15px;">Nenhum conteúdo cadastrado.</p>';
+}
+
+// ========== GERAR DEFESA EM PDF ==========
+function gerarDefesaPDF(id){
+    let p = id ? processos.find(x=>x.id==id) : processos.find(x=>x.id == document.getElementById('doc-processo').value);
+    if(!p) return alert('Selecione um processo!');
+    let vei = veiculos.find(v=>v.id == p.veiculoId);
+    let dono = vei ? clientes.find(c=>c.id == vei.clienteId) : null;
+    let hoje = new Date();
+    let dataHoje = hoje.toLocaleDateString('pt-BR', {day:'numeric', month:'long', year:'numeric'});
+
+    let conteudo = `
+DEFESA PRÉVIA DE INFRAÇÃO DE TRÂNSITO
+
+Órgão Autuador: ${p.orgao}
+Nº do Auto: ${p.numero}
+Placa do Veículo: ${vei?vei.placa:'—'}
+Proprietário: ${dono?dono.nome:'—'}
+CPF/CNPJ: ${dono?dono.cpf:'—'}
+Endereço: ${dono?dono.endereco:'—'}
+
+Infração: ${p.artigo} — ${p.descricao}
+Data: ${new Date(p.data+'T00:00:00').toLocaleDateString('pt-BR')}
+Local: ${p.local}
+Valor: R$ ${p.valor} | Pontos: ${p.pontos}
+
+Exmo. Senhor Presidente da Autoridade Competente,
+
+O presente documento tem por objetivo apresentar DEFESA PRÉVIA contra a infração acima descrita, com base na legislação vigente, especialmente no Código de Trânsito Brasileiro.
+
+A defesa será apresentada com os fundamentos de fato e de direito pertinentes.
+
+Atenciosamente,
+
+São Paulo, ${dataHoje}
+
+___________________________________________
+${dono?dono.nome:'Proprietário'}
+`.trim();
+
+    let blob = new Blob([conteudo], {type:'text/plain;charset=utf-8'});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = `Defesa_${p.numero}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('✅ Defesa gerada! Verifique seus downloads.');
+}
+
+// ========== EXCLUIR ==========
+function excluirItem(tipo, id){
+    if(!confirm('Excluir esse registro?')) return;
+    if(tipo==='clientes') clientes = clientes.filter(x=>x.id!==id);
+    if(tipo==='veiculos') veiculos = veiculos.filter(x=>x.id!==id);
+    if(tipo==='processos') processos = processos.filter(x=>x.id!==id);
+    if(tipo==='biblioteca') biblioteca = biblioteca.filter(x=>x.id!==id);
+    salvarDados();
+}
+
+// ========== ATUALIZAR TUDO ==========
+function atualizarTudo(){
+    // Contadores
+    document.getElementById('qtd-processos').textContent = processos.length;
+    let hoje = new Date().toISOString().split('T')[0];
+    let prazosVencer = processos.filter(p=>p.prazoDefesa && p.prazoDefesa >= hoje).length;
+    document.getElementById('qtd-prazos').textContent = prazosVencer;
+
+    // Lista próximos prazos
+    let proximos = processos.filter(p=>p.prazoDefesa).sort((a,b)=>a.prazoDefesa.localeCompare(b.prazoDefesa)).slice(0,5);
+    let htmlPrazos = proximos.length ? proximos.map(p=>{
+        let vencido = p.prazoDefesa < hoje ? 'vencendo' : '';
+        return `<div class="linha ${vencendo}">${p.numero} — até ${p.prazoDefesa}</div>`;
+    }).join('') : 'Nenhum prazo cadastrado.';
+    document.getElementById('lista-prazos').innerHTML = htmlPrazos;
+
+    // Preencher combos
+    let selCli = '<option value="">Selecione um cliente</option>' + clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+    document.getElementById('vei-cliente').innerHTML = selCli;
+
+    let selVei = '<option value="">Selecione um veículo</option>' + veiculos.map(v=>{
+        let d = clientes.find(c=>c.id==v.clienteId);
+        return `<option value="${v.id}">${v.placa} — ${d?d.nome:'—'}</option>`;
+    }).join('');
+    document.getElementById('proc-veiculo').innerHTML = selVei;
+    document.getElementById('doc-processo').innerHTML = '<option value="">Selecione...</option>' + processos.map(p=>`<option value="${p.id}">${p.numero}</option>`).join('');
+
+    // Renderizar listas
+    renderClientes();
+    renderVeiculos();
+    renderProcessos();
+    renderBiblioteca();
+}
+
+// ========== INICIAR ==========
+atualizarTudo();
+</script>
+</body>
+</html>
 
