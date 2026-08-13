@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,32 +6,33 @@
     <title>Gestão de Multas e Processos</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f0f4f8; color: #1e293b; }
-        header { background-color: #162c47; color: white; padding: 1.2rem; font-size: 1.3rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        body { background: #f0f4f8; color: #1e293b; }
+        header { background: #162c47; color: white; padding: 1.2rem; font-size: 1.3rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
         .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
         .painel { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
         .card { padding: 1.2rem; border-radius: 10px; text-align: center; font-size: 1.1rem; font-weight: 500; }
-        .card-azul { background-color: #2563eb; color: white; }
-        .card-laranja { background-color: #f59e0b; color: white; }
-        form { background-color: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 2rem; }
+        .card-azul { background: #2563eb; color: white; }
+        .card-laranja { background: #f59e0b; color: white; }
+        form { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 2rem; }
+        h2 { margin: 1rem 0; color: #162c47; }
         label { display: block; margin: 1rem 0 0.4rem; font-weight: 500; color: #334155; }
-        input, select { width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background-color: #fcfcfc; }
-        button { margin-top: 1.5rem; padding: 1rem; width: 100%; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-        button:hover { background-color: #1d4ed8; }
+        input, select, textarea { width: 100%; padding: 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fcfcfc; }
+        button { margin-top: 1.5rem; padding: 1rem; width: 100%; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
         .lista { margin-top: 2rem; }
-        .item { background-color: white; padding: 1.2rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #2563eb; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .item { background: white; padding: 1.2rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid #2563eb; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
         .item p { margin: 0.3rem 0; color: #475569; }
         .item strong { color: #1e293b; }
         .vazio { text-align: center; color: #64748b; padding: 2rem; }
-        nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: white; display: flex; justify-content: space-around; padding: 0.7rem 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
+        nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 0.7rem 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 100; }
         nav a { text-align: center; color: #475569; text-decoration: none; font-size: 0.85rem; }
         nav a.ativo { color: #2563eb; font-weight: 600; }
         .pagina { display: none; }
         .pagina.ativa { display: block; }
         main { padding-bottom: 70px; }
         .botoes-acao { display: flex; gap: 0.75rem; margin-top: 0.8rem; }
-        .btn-excluir { background-color: #dc2626; padding: 0.6rem 1.2rem; width: auto; font-size: 0.95rem; margin-top: 0; }
-        .btn-excluir:hover { background-color: #b91c1c; }
+        .btn-excluir { background: #dc2626; padding: 0.6rem 1.2rem; width: auto; font-size: 0.95rem; margin-top: 0; }
+        .btn-excluir:hover { background: #b91c1c; }
     </style>
 </head>
 <body>
@@ -40,9 +40,9 @@
 <header>⚖️ Gestão de Multas e Processos</header>
 <main class="container">
 
-    <!-- Página Início -->
+    <!-- Início -->
     <div id="pagina-inicio" class="pagina ativa">
-        <h2 style="margin: 1rem 0;">Painel de Acompanhamento</h2>
+        <h2>Painel de Acompanhamento</h2>
         <div class="painel">
             <div class="card card-azul">
                 <div id="qtd-processos">0</div>
@@ -57,59 +57,108 @@
         <div id="lista-prazos" class="vazio">Nenhum prazo cadastrado.</div>
     </div>
 
-    <!-- Página Processo -->
+    <!-- Cliente -->
+    <div id="pagina-cliente" class="pagina">
+        <h2>Dados do Cliente</h2>
+        <form id="form-cliente">
+            <label>Nome Completo</label>
+            <input type="text" id="cliente-nome" placeholder="Digite o nome">
+            <label>CPF / CNPJ</label>
+            <input type="text" id="cliente-cpf" placeholder="000.000.000-00">
+            <label>Endereço</label>
+            <input type="text" id="cliente-endereco" placeholder="Rua, número, bairro">
+            <label>Telefone</label>
+            <input type="text" id="cliente-telefone" placeholder="(11) 99999-9999">
+            <label>E-mail</label>
+            <input type="email" id="cliente-email" placeholder="email@exemplo.com">
+            <button type="submit">✅ Salvar Cliente</button>
+        </form>
+        <div id="dados-cliente" class="lista"></div>
+    </div>
+
+    <!-- Veículo -->
+    <div id="pagina-veiculo" class="pagina">
+        <h2>Dados do Veículo</h2>
+        <form id="form-veiculo">
+            <label>Placa</label>
+            <input type="text" id="veiculo-placa" placeholder="ABC1D23">
+            <label>Marca / Modelo</label>
+            <input type="text" id="veiculo-modelo" placeholder="Ex: Fiat Uno">
+            <label>Ano</label>
+            <input type="text" id="veiculo-ano" placeholder="2020">
+            <label>Cor</label>
+            <input type="text" id="veiculo-cor" placeholder="Prata">
+            <label>Proprietário</label>
+            <input type="text" id="veiculo-proprietario" placeholder="Nome do proprietário">
+            <button type="submit">✅ Salvar Veículo</button>
+        </form>
+        <div id="lista-veiculos" class="lista"></div>
+    </div>
+
+    <!-- Processo -->
     <div id="pagina-processo" class="pagina">
-        <h2 style="margin: 1rem 0;">Cadastrar Processo</h2>
+        <h2>Cadastrar Processo</h2>
         <form id="form-processo">
             <label>Veículo / Condutor</label>
-            <select id="veiculo">
-                <option value="EEXX3L – José">EEXX3L – José</option>
-            </select>
-
+            <input type="text" id="proc-condutor" placeholder="Placa – Nome">
             <label>Nº do Auto de Infração</label>
-            <input type="text" id="numero-auto" placeholder="Ex: 5473828292" required>
-
+            <input type="text" id="proc-numero" placeholder="Ex: 5473828292">
             <label>Órgão Autuador</label>
-            <input type="text" id="orgao" value="Detran" required>
-
-            <label>Artigo / Código Infração</label>
-            <input type="text" id="artigo" placeholder="Ex: 180" required>
-
+            <input type="text" id="proc-orgao" value="Detran">
+            <label>Artigo / Código</label>
+            <input type="text" id="proc-artigo" placeholder="Ex: 180">
             <label>Descrição da Infração</label>
-            <input type="text" id="descricao" placeholder="Descreva a infração" required>
-
+            <input type="text" id="proc-descricao" placeholder="Descreva a infração">
             <label>Valor da Multa (R$)</label>
-            <input type="number" step="0.01" id="valor" placeholder="450,00" required>
-
+            <input type="number" step="0.01" id="proc-valor" placeholder="450,00">
             <label>Pontos na Carteira</label>
-            <input type="number" id="pontos" placeholder="2" required>
-
+            <input type="number" id="proc-pontos" placeholder="2">
             <label>Data da Infração</label>
-            <input type="date" id="data-infracao" required>
-
-            <label>Local da Infração</label>
-            <input type="text" id="local" value="São Paulo" required>
-
+            <input type="date" id="proc-data">
+            <label>Local</label>
+            <input type="text" id="proc-local" value="São Paulo">
             <label>Fase Processual</label>
-            <select id="fase">
-                <option value="Recurso JARI">Recurso JARI</option>
-                <option value="Recurso CETRAN">Recurso CETRAN</option>
-                <option value="Defesa">Defesa</option>
+            <select id="proc-fase">
+                <option>Defesa</option>
+                <option>Recurso JARI</option>
+                <option>Recurso CETRAN</option>
             </select>
-
             <label>Prazo para Defesa</label>
-            <input type="date" id="prazo-defesa" required>
-
+            <input type="date" id="proc-prazo-defesa">
             <label>Prazo para Recurso</label>
-            <input type="date" id="prazo-recurso" required>
-
+            <input type="date" id="proc-prazo-recurso">
             <button type="submit">✅ Salvar Processo</button>
         </form>
+        <h2>Lista de Processos</h2>
+        <div id="lista-processos" class="lista"><p class="vazio">Nenhum processo cadastrado.</p></div>
+    </div>
 
-        <h2 style="margin: 2.5rem 0 1rem;">Lista de Processos</h2>
-        <div id="lista-processos">
-            <p class="vazio">Nenhum processo cadastrado.</p>
-        </div>
+    <!-- Leis -->
+    <div id="pagina-leis" class="pagina">
+        <h2>Base Legal</h2>
+        <form id="form-lei">
+            <label>Artigo / Código</label>
+            <input type="text" id="lei-codigo" placeholder="Ex: Art. 180">
+            <label>Descrição</label>
+            <textarea id="lei-descricao" rows="4" placeholder="Texto da lei ou artigo"></textarea>
+            <button type="submit">✅ Salvar Artigo</button>
+        </form>
+        <h2>Artigos Cadastrados</h2>
+        <div id="lista-leis" class="lista"><p class="vazio">Nenhum artigo cadastrado.</p></div>
+    </div>
+
+    <!-- Documentos -->
+    <div id="pagina-doc" class="pagina">
+        <h2>Documentos e Arquivos</h2>
+        <form id="form-doc">
+            <label>Nome / Título do Documento</label>
+            <input type="text" id="doc-nome" placeholder="Ex: Auto de Infração nº 123">
+            <label>Descrição / Observações</label>
+            <textarea id="doc-desc" rows="3" placeholder="Informações sobre o documento"></textarea>
+            <button type="submit">✅ Salvar Documento</button>
+        </form>
+        <h2>Documentos Salvos</h2>
+        <div id="lista-docs" class="lista"><p class="vazio">Nenhum documento salvo.</p></div>
     </div>
 
 </main>
@@ -125,136 +174,155 @@
 </nav>
 
 <script>
-// === GERENCIAMENTO DE DADOS ===
-function getProcessos() {
-    return JSON.parse(localStorage.getItem('processos') || '[]');
-}
+// === FUNÇÕES AUXILIARES ===
+function lsGet(chave) { return JSON.parse(localStorage.getItem(chave) || '[]'); }
+function lsSet(chave, lista) { localStorage.setItem(chave, JSON.stringify(lista)); }
+function formatarData(d) { if(!d)return'-'; const [a,m,dd]=d.split('-'); return `${dd}/${m}/${a}`; }
+function diasAte(d) { if(!d)return9999; const alvo=new Date(d), hj=new Date(); hj.setHours(0,0,0,0); return Math.ceil((alvo-hj)/(1000*60*60*24)); }
 
-function salvarProcessos(lista) {
-    localStorage.setItem('processos', JSON.stringify(lista));
-    atualizarTela();
-}
-
-function cadastrarProcesso(dados) {
-    const lista = getProcessos();
-    lista.push(dados);
-    salvarProcessos(lista);
-}
-
-function excluirProcesso(indice) {
-    if (confirm('Tem certeza que deseja excluir este processo?')) {
-        const lista = getProcessos();
-        lista.splice(indice, 1);
-        salvarProcessos(lista);
-    }
-}
-
-function formatarData(dataISO) {
-    if (!dataISO) return '-';
-    const [ano, mes, dia] = dataISO.split('-');
-    return `${dia}/${mes}/${ano}`;
-}
-
-function diasAte(dataISO) {
-    if (!dataISO) return 9999;
-    const alvo = new Date(dataISO);
-    const hoje = new Date();
-    const diff = alvo - hoje;
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
-
-// === ATUALIZAR TUDO NA TELA ===
-function atualizarTela() {
-    const processos = getProcessos();
-
-    // Painel
-    document.getElementById('qtd-processos').textContent = processos.length;
-
-    // Prazos a vencer
-    const hoje = new Date(); hoje.setHours(0,0,0,0);
-    const prazosAbertos = processos.filter(p => new Date(p.prazoDefesa) >= hoje || new Date(p.prazoRecurso) >= hoje);
-    document.getElementById('qtd-prazos').textContent = prazosAbertos.length;
-
-    // Lista de próximos prazos
-    const prazosDiv = document.getElementById('lista-prazos');
-    const proximos = [...processos].sort((a,b) => new Date(a.prazoDefesa) - new Date(b.prazoDefesa));
-    const proximosHTML = proximos.map(p => {
-        const dias = diasAte(p.prazoDefesa);
-        const alerta = dias <= 5 ? ' ⚠️' : '';
-        return `<div class="item">
-            <strong>${p.numeroAuto} — ${p.veiculo}</strong>
-            <p>Defesa até: ${formatarData(p.prazoDefesa)} (${dias} dias)${alerta}</p>
-        </div>`;
-    }).join('');
-    prazosDiv.innerHTML = proximosHTML || '<p class="vazio">Nenhum prazo cadastrado.</p>';
-
-    // Lista de processos
-    const listaDiv = document.getElementById('lista-processos');
-    if (processos.length === 0) {
-        listaDiv.innerHTML = '<p class="vazio">Nenhum processo cadastrado.</p>';
-    } else {
-        listaDiv.innerHTML = processos.map((p, i) => `
-        <div class="item">
-            <p><strong>Veículo/Condutor:</strong> ${p.veiculo}</p>
-            <p><strong>Nº Auto:</strong> ${p.numeroAuto}</p>
-            <p><strong>Órgão:</strong> ${p.orgao}</p>
-            <p><strong>Artigo:</strong> ${p.artigo}</p>
-            <p><strong>Descrição:</strong> ${p.descricao}</p>
-            <p><strong>Valor:</strong> R$ ${parseFloat(p.valor).toFixed(2).replace('.', ',')}</p>
-            <p><strong>Pontos:</strong> ${p.pontos}</p>
-            <p><strong>Data Infração:</strong> ${formatarData(p.dataInfracao)}</p>
-            <p><strong>Local:</strong> ${p.local}</p>
-            <p><strong>Fase:</strong> ${p.fase}</p>
-            <p><strong>Prazo Defesa:</strong> ${formatarData(p.prazoDefesa)}</p>
-            <p><strong>Prazo Recurso:</strong> ${formatarData(p.prazoRecurso)}</p>
-            <div class="botoes-acao">
-                <button class="btn-excluir" onclick="excluirProcesso(${i})">🗑️ Excluir</button>
-            </div>
-        </div>`).join('');
-    }
-}
-
-// === NAVEGAÇÃO ENTRE ABAS ===
-document.querySelectorAll('.aba').forEach(aba => {
-    aba.addEventListener('click', e => {
+// === NAVEGAÇÃO ===
+document.querySelectorAll('.aba').forEach(aba=>{
+    aba.addEventListener('click',e=>{
         e.preventDefault();
-        document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativo'));
+        document.querySelectorAll('.aba').forEach(a=>a.classList.remove('ativo'));
         aba.classList.add('ativo');
-        const pagina = aba.dataset.pagina;
-        document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
-        document.getElementById(`pagina-${pagina}`).classList.add('ativa');
+        document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
+        document.getElementById(`pagina-${aba.dataset.pagina}`).classList.add('ativa');
     });
 });
 
-// === SALVAR FORMULÁRIO ===
-document.getElementById('form-processo').addEventListener('submit', e => {
+// === CLIENTE ===
+document.getElementById('form-cliente').addEventListener('submit',e=>{
     e.preventDefault();
-
-    const dados = {
-        veiculo: document.getElementById('veiculo').value,
-        numeroAuto: document.getElementById('numero-auto').value.trim(),
-        orgao: document.getElementById('orgao').value.trim(),
-        artigo: document.getElementById('artigo').value.trim(),
-        descricao: document.getElementById('descricao').value.trim(),
-        valor: document.getElementById('valor').value,
-        pontos: document.getElementById('pontos').value,
-        dataInfracao: document.getElementById('data-infracao').value,
-        local: document.getElementById('local').value.trim(),
-        fase: document.getElementById('fase').value,
-        prazoDefesa: document.getElementById('prazo-defesa').value,
-        prazoRecurso: document.getElementById('prazo-recurso').value
+    const c = {
+        nome:document.getElementById('cliente-nome').value.trim(),
+        cpf:document.getElementById('cliente-cpf').value.trim(),
+        endereco:document.getElementById('cliente-endereco').value.trim(),
+        telefone:document.getElementById('cliente-telefone').value.trim(),
+        email:document.getElementById('cliente-email').value.trim()
     };
-
-    cadastrarProcesso(dados);
+    lsSet('clientes', [c]);
     e.target.reset();
-    alert('✅ Processo salvo com sucesso!');
+    alert('✅ Cliente salvo!');
+    atualizarTela();
 });
 
-// === INICIAR AO CARREGAR ===
+// === VEÍCULO ===
+document.getElementById('form-veiculo').addEventListener('submit',e=>{
+    e.preventDefault();
+    const v = {
+        placa:document.getElementById('veiculo-placa').value.trim().toUpperCase(),
+        modelo:document.getElementById('veiculo-modelo').value.trim(),
+        ano:document.getElementById('veiculo-ano').value.trim(),
+        cor:document.getElementById('veiculo-cor').value.trim(),
+        proprietario:document.getElementById('veiculo-proprietario').value.trim()
+    };
+    const lista = lsGet('veiculos');
+    lista.push(v); lsSet('veiculos',lista);
+    e.target.reset(); alert('✅ Veículo salvo!');
+    atualizarTela();
+});
+window.excluirVeiculo = i => { if(confirm('Excluir?')){ const l=lsGet('veiculos'); l.splice(i,1); lsSet('veiculos',l); atualizarTela(); } };
+
+// === PROCESSO ===
+document.getElementById('form-processo').addEventListener('submit',e=>{
+    e.preventDefault();
+    const p = {
+        condutor:document.getElementById('proc-condutor').value.trim(),
+        numero:document.getElementById('proc-numero').value.trim(),
+        orgao:document.getElementById('proc-orgao').value.trim(),
+        artigo:document.getElementById('proc-artigo').value.trim(),
+        descricao:document.getElementById('proc-descricao').value.trim(),
+        valor:document.getElementById('proc-valor').value,
+        pontos:document.getElementById('proc-pontos').value,
+        data:document.getElementById('proc-data').value,
+        local:document.getElementById('proc-local').value.trim(),
+        fase:document.getElementById('proc-fase').value,
+        prazoDefesa:document.getElementById('proc-prazo-defesa').value,
+        prazoRecurso:document.getElementById('proc-prazo-recurso').value
+    };
+    const lista = lsGet('processos');
+    lista.push(p); lsSet('processos',lista);
+    e.target.reset(); alert('✅ Processo salvo!');
+    atualizarTela();
+});
+window.excluirProcesso = i => { if(confirm('Excluir?')){ const l=lsGet('processos'); l.splice(i,1); lsSet('processos',l); atualizarTela(); } };
+
+// === LEIS ===
+document.getElementById('form-lei').addEventListener('submit',e=>{
+    e.preventDefault();
+    const l = { codigo:document.getElementById('lei-codigo').value.trim(), descricao:document.getElementById('lei-descricao').value.trim() };
+    const lista = lsGet('leis'); lista.push(l); lsSet('leis',lista);
+    e.target.reset(); alert('✅ Artigo salvo!'); atualizarTela();
+});
+window.excluirLei = i => { if(confirm('Excluir?')){ const l=lsGet('leis'); l.splice(i,1); lsSet('leis',l); atualizarTela(); } };
+
+// === DOCUMENTOS ===
+document.getElementById('form-doc').addEventListener('submit',e=>{
+    e.preventDefault();
+    const d = { nome:document.getElementById('doc-nome').value.trim(), desc:document.getElementById('doc-desc').value.trim() };
+    const lista = lsGet('docs'); lista.push(d); lsSet('docs',lista);
+    e.target.reset(); alert('✅ Documento salvo!'); atualizarTela();
+});
+window.excluirDoc = i => { if(confirm('Excluir?')){ const l=lsGet('docs'); l.splice(i,1); lsSet('docs',l); atualizarTela(); } };
+
+// === ATUALIZAR TUDO ===
+function atualizarTela(){
+    // Início
+    const processos = lsGet('processos');
+    document.getElementById('qtd-processos').textContent = processos.length;
+    const hj = new Date(); hj.setHours(0,0,0,0);
+    const abertos = processos.filter(p=>new Date(p.prazoDefesa)>=hj || new Date(p.prazoRecurso)>=hj);
+    document.getElementById('qtd-prazos').textContent = abertos.length;
+    const prazosHTML = processos.sort((a,b)=>new Date(a.prazoDefesa)-new Date(b.prazoDefesa)).map(p=>{
+        const d = diasAte(p.prazoDefesa);
+        return `<div class="item"><strong>${p.numero} — ${p.condutor}</strong><p>Defesa: ${formatarData(p.prazoDefesa)} (${d} dias) ${d<=5?'⚠️':''}</p></div>`;
+    }).join('');
+    document.getElementById('lista-prazos').innerHTML = prazosHTML || '<p class="vazio">Nenhum prazo cadastrado.</p>';
+
+    // Cliente
+    const cli = lsGet('clientes')[0];
+    document.getElementById('dados-cliente').innerHTML = cli ? `<div class="item">
+        <p><strong>Nome:</strong> ${cli.nome}</p><p><strong>CPF/CNPJ:</strong> ${cli.cpf}</p>
+        <p><strong>Endereço:</strong> ${cli.endereco}</p><p><strong>Telefone:</strong> ${cli.telefone}</p><p><strong>E-mail:</strong> ${cli.email}</p>
+    </div>` : '<p class="vazio">Nenhum cliente salvo.</p>';
+
+    // Veículos
+    const veiculos = lsGet('veiculos');
+    document.getElementById('lista-veiculos').innerHTML = veiculos.length ? veiculos.map((v,i)=>`<div class="item">
+        <p><strong>Placa:</strong> ${v.placa}</p><p><strong>Modelo:</strong> ${v.modelo} — ${v.ano} — ${v.cor}</p>
+        <p><strong>Proprietário:</strong> ${v.proprietario}</p>
+        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirVeiculo(${i})">🗑️ Excluir</button></div>
+    </div>`).join('') : '<p class="vazio">Nenhum veículo cadastrado.</p>';
+
+    // Processos
+    document.getElementById('lista-processos').innerHTML = processos.length ? processos.map((p,i)=>`<div class="item">
+        <p><strong>Condutor:</strong> ${p.condutor}</p><p><strong>Nº Auto:</strong> ${p.numero}</p>
+        <p><strong>Órgão:</strong> ${p.orgao}</p><p><strong>Artigo:</strong> ${p.artigo}</p><p><strong>Descrição:</strong> ${p.descricao}</p>
+        <p><strong>Valor:</strong> R$ ${parseFloat(p.valor).toFixed(2).replace('.',',')} — <strong>Pontos:</strong> ${p.pontos}</p>
+        <p><strong>Data Infração:</strong> ${formatarData(p.data)} — <strong>Local:</strong> ${p.local}</p>
+        <p><strong>Fase:</strong> ${p.fase}</p><p><strong>Prazo Defesa:</strong> ${formatarData(p.prazoDefesa)} — <strong>Recurso:</strong> ${formatarData(p.prazoRecurso)}</p>
+        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirProcesso(${i})">🗑️ Excluir</button></div>
+    </div>`).join('') : '<p class="vazio">Nenhum processo cadastrado.</p>';
+
+    // Leis
+    const leis = lsGet('leis');
+    document.getElementById('lista-leis').innerHTML = leis.length ? leis.map((l,i)=>`<div class="item">
+        <p><strong>${l.codigo}</strong></p><p>${l.descricao}</p>
+        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirLei(${i})">🗑️ Excluir</button></div>
+    </div>`).join('') : '<p class="vazio">Nenhum artigo cadastrado.</p>';
+
+    // Documentos
+    const docs = lsGet('docs');
+    document.getElementById('lista-docs').innerHTML = docs.length ? docs.map((d,i)=>`<div class="item">
+        <p><strong>${d.nome}</strong></p><p>${d.desc}</p>
+        <div class="botoes-acao"><button class="btn-excluir" onclick="excluirDoc(${i})">🗑️ Excluir</button></div>
+    </div>`).join('') : '<p class="vazio">Nenhum documento salvo.</p>';
+}
+
 window.onload = atualizarTela;
 </script>
 
 </body>
-</html>
-
-            
+    </html>
+    
